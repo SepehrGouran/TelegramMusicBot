@@ -1,17 +1,18 @@
 package main;
 
-import org.apache.http.HttpRequest;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.TelegramBotAdapter;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.UnknownHostException;
 
 /**
@@ -22,19 +23,10 @@ public class Main {
 
         Logger logger = LoggerFactory.getLogger(Main.class);
 
-        String URL = "http://www.google.com";
+        String baseURL = "https://api.telegram.org/bot291366280:AAHFt-W8VwmGjLEunUsSinti2Cf0taynmsw";
+        String getMeMethod = "/getMe";
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
 
-        try {
-            HttpResponse response = httpClient.execute(new HttpGet(URL));
-            int statusCode = response.getStatusLine().getStatusCode();
-            logger.info("Status Code: " + statusCode);
-
-        } catch (UnknownHostException e) {
-            logger.error("Check your internet connection");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TelegramBot telegramBot = TelegramBotAdapter.build("291366280:AAHFt-W8VwmGjLEunUsSinti2Cf0taynmsw");
     }
 }
