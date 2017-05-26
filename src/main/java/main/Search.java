@@ -15,6 +15,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.jmusixmatch.MusixMatch;
+import org.jmusixmatch.MusixMatchException;
+import org.jmusixmatch.entity.track.Track;
+import org.jmusixmatch.entity.track.TrackData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +66,7 @@ public class Search {
          * @param args command line args.
          */
         public static void main(String[] args) {
+
             // Read the developer key from the properties file.
             Properties properties = new Properties();
             try {
@@ -127,17 +132,28 @@ public class Search {
      */
         private static String getInputQuery() throws IOException {
 
-            String inputQuery = "";
+            String track = "";
+            String artist = "";
 
-            System.out.print("Please enter a search term: ");
-            BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
-            inputQuery = bReader.readLine();
+            System.out.print("Please enter the Track name: ");
+            BufferedReader bReaderTrack = new BufferedReader(new InputStreamReader(System.in));
+            track = bReaderTrack.readLine();
 
-            if (inputQuery.length() < 1) {
+            //System.out.print("Please enter Artist name: ");
+            //BufferedReader bReaderArtist = new BufferedReader(new InputStreamReader(System.in));
+            //artist = bReaderArtist.readLine();
+
+            if (track.length() < 1) {
                 // Use the string "YouTube Developers Live" as a default.
-                inputQuery = "YouTube Developers Live";
+                track = " ";
             }
-            return inputQuery;
+
+            if (artist.length() < 1) {
+                // Use the string "YouTube Developers Live" as a default.
+                artist = " ";
+            }
+
+            return track;
         }
 
     /*
@@ -172,8 +188,13 @@ public class Search {
                     System.out.println(" Video Id" + rId.getVideoId());
                     System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
                     System.out.println(" Thumbnail: " + thumbnail.getUrl());
+                    YouTubeMp3 youTubeMp3 = new YouTubeMp3();
+                    String downloadLink = youTubeMp3.getDownloadLink("https://www.youtube.com/watch?v=" + rId.getVideoId());
+                    System.out.println(downloadLink);
                     System.out.println("\n-------------------------------------------------------------\n");
                 }
+
+
             }
         }
 
