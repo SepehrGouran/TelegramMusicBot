@@ -41,7 +41,7 @@ public class Auth {
                 || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
             System.out.println(
                     "Enter Client ID and Secret from https://console.developers.google.com/project/_/apiui/credential "
-                            + "into src/main/resources/client_secrets.json");
+                            + "into src/youtube/resources/client_secrets.json");
             System.exit(1);
         }
 

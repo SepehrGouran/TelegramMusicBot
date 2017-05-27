@@ -1,4 +1,4 @@
-package main;
+package youtube;
 
 import Oauth2.Auth;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -9,27 +9,10 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.TelegramBotAdapter;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.jmusixmatch.MusixMatch;
-import org.jmusixmatch.MusixMatchException;
-import org.jmusixmatch.entity.track.Track;
-import org.jmusixmatch.entity.track.TrackData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.pengrad.telegrambot.model.Message;
 
-import javax.media.Manager;
-import javax.media.MediaLocator;
-import javax.media.NoPlayerException;
-import javax.media.Player;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -38,16 +21,6 @@ import java.util.Properties;
  * Created by Sepehr on 5/25/2017.
  */
 public class Search {
-
-
-        /*Logger logger = LoggerFactory.getLogger(Search.class);
-
-        String baseURL = "https://api.telegram.org/bot291366280:AAHFt-W8VwmGjLEunUsSinti2Cf0taynmsw";
-        String getMeMethod = "/getMe";
-
-
-        TelegramBot telegramBot = TelegramBotAdapter.build("291366280:AAHFt-W8VwmGjLEunUsSinti2Cf0taynmsw");*/
-
 
         private static final String PROPERTIES_FILENAME = "youtube.properties";
 
@@ -59,13 +32,8 @@ public class Search {
          */
         private static YouTube youtube;
 
-        /**
-         * Initialize a YouTube object to search for videos on YouTube. Then
-         * display the name and thumbnail image of each video in the result set.
-         *
-         * @param args command line args.
-         */
-        public static void main(String[] args) {
+
+        public ArrayList<String> search(String searchString) {
 
             // Read the developer key from the properties file.
             Properties properties = new Properties();
@@ -90,7 +58,7 @@ public class Search {
                 }).setApplicationName("youtube-cmdline-search-sample").build();
 
                 // Prompt the user to enter a query term.
-                String queryTerm = getInputQuery();
+                //String queryTerm = getInputQuery();
 
                 // Define the API request for retrieving search results.
                 YouTube.Search.List search = youtube.search().list("id,snippet");
@@ -100,7 +68,7 @@ public class Search {
                 // {{ https://cloud.google.com/console }}
                 String apiKey = properties.getProperty("youtube.apikey");
                 search.setKey(apiKey);
-                search.setQ(queryTerm);
+                search.setQ(searchString);
 
                 // Restrict the search results to only include videos. See:
                 // https://developers.google.com/youtube/v3/docs/search/list#type
@@ -115,7 +83,7 @@ public class Search {
                 SearchListResponse searchResponse = search.execute();
                 List<SearchResult> searchResultList = searchResponse.getItems();
                 if (searchResultList != null) {
-                    prettyPrint(searchResultList.iterator(), queryTerm);
+                    return (ArrayList<String>) prettyPrint(searchResultList.iterator(), searchString);
                 }
             } catch (GoogleJsonResponseException e) {
                 System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -125,6 +93,11 @@ public class Search {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+
+            ArrayList<String> res = new ArrayList<>();
+            res.add("Could not found any result");
+            return res;
+
         }
 
     /*
@@ -164,7 +137,7 @@ public class Search {
      *
      * @param query Search query (String)
      */
-        private static void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
+        private List<String> prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
 
             System.out.println("\n=============================================================");
             System.out.println(
@@ -175,10 +148,14 @@ public class Search {
                 System.out.println(" There aren't any results for your query.");
             }
 
-            while (iteratorSearchResults.hasNext()) {
+            SearchResult singleVideo = null;
+            ResourceId rId = null;
+            String downloadLink = null;
 
-                SearchResult singleVideo = iteratorSearchResults.next();
-                ResourceId rId = singleVideo.getId();
+            //while (iteratorSearchResults.hasNext()) {
+
+                singleVideo = iteratorSearchResults.next();
+                rId = singleVideo.getId();
 
                 // Confirm that the result represents a video. Otherwise, the
                 // item will not contain a video ID.
@@ -189,13 +166,19 @@ public class Search {
                     System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
                     System.out.println(" Thumbnail: " + thumbnail.getUrl());
                     YouTubeMp3 youTubeMp3 = new YouTubeMp3();
-                    String downloadLink = youTubeMp3.getDownloadLink("https://www.youtube.com/watch?v=" + rId.getVideoId());
+                    downloadLink = youTubeMp3.getDownloadLink("https://www.youtube.com/watch?v=" + rId.getVideoId());
                     System.out.println(downloadLink);
                     System.out.println("\n-------------------------------------------------------------\n");
                 }
 
 
-            }
+            //}
+
+            List<String> result = new ArrayList<>();
+            result.add(singleVideo.getSnippet().getTitle());
+            result.add(downloadLink);
+
+            return result;
         }
 
 }
